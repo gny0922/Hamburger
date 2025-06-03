@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public GameObject countdownUI;
     public TextMeshProUGUI countdownText;
+    public TextMeshProUGUI timerText;
 
     public float gameDuration = 180f; // 3분
     private float remainingTime;
@@ -46,6 +47,19 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (gameRunning)
+        {
+            remainingTime -= Time.deltaTime;
+            if (remainingTime <= 0f)
+            {
+                remainingTime = 0f;
+                gameRunning = false;
+                EndGame();
+            }
+
+            UpdateTimerUI(); // 여기서 UI 갱신
+        }
+
         if (!gameRunning) return;
 
         remainingTime -= Time.deltaTime;
@@ -60,5 +74,12 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("게임 종료! 점수 표시 등...");
         // 결과 패널 표시 or 씬 전환 등 구현
+    }
+
+    void UpdateTimerUI()
+    {
+        int minutes = Mathf.FloorToInt(remainingTime / 60f);
+        int seconds = Mathf.FloorToInt(remainingTime % 60f);
+        timerText.text = $"{minutes:00}:{seconds:00}";
     }
 }
