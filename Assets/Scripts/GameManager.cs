@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public GameObject countdownUI;
     public TextMeshProUGUI countdownText;
     public TextMeshProUGUI timerText;
+   
 
     public float gameDuration = 180f; // 3분
     private float remainingTime;
@@ -40,7 +41,8 @@ public class GameManager : MonoBehaviour
         remainingTime = gameDuration;
 
         customerAsset.SetActive(true);              // 손님 에셋 등장
-      //  burgerGenerator.GenerateBurger();           // 예시 햄버거 생성
+        
+        //  burgerGenerator.GenerateBurger();           // 예시 햄버거 생성
 
         // 타이머 동작 시작 → Update()에서 관리
     }
@@ -74,6 +76,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("게임 종료! 점수 표시 등...");
         // 결과 패널 표시 or 씬 전환 등 구현
+       
     }
 
     void UpdateTimerUI()
