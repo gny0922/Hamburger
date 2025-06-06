@@ -14,9 +14,10 @@ GameObject:
   - component: {fileID: 8763379791254502342}
   - component: {fileID: 5503839360607844966}
   - component: {fileID: 8243398827620150159}
+  - component: {fileID: -4216265204024517544}
   m_Layer: 0
   m_Name: Burger_Top
-  m_TagString: Untagged
+  m_TagString: Ingredient
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -257,3 +258,18 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 1352247630307058691, guid: 138edd300b607414686f4c88d101c1a1, type: 3}
+--- !u!114 &-4216265204024517544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6862035926819888771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73c8f177fc0bf1445a32938d17391018, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ingredientType: 0
+  height: 0.02
+  meshPrefab: {fileID: 6638075211704730225, guid: 6a3d20eeadad51949a76a17860c4f648, type: 3}
