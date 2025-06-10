@@ -1,6 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class OrderDeliveryZone : MonoBehaviour
 {
@@ -25,15 +26,30 @@ public class OrderDeliveryZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        StackHamburger hamburger = other.GetComponent<StackHamburger>();
-        if (hamburger != null && hamburger.isComplete && !hamburgersInZone.Contains(hamburger))
-            hamburgersInZone.Add(hamburger);
+        Debug.Log($"OnTriggerEnter: {other.name}");
+
+        StackHamburger hamburger = other.GetComponentInChildren<StackHamburger>();
+        if (hamburger != null)
+        {
+            Debug.Log($"햄버거 발견: {hamburger.name}, 완성 상태: {hamburger.isComplete}");
+            if (hamburger.isComplete && !hamburgersInZone.Contains(hamburger))
+            {
+                hamburgersInZone.Add(hamburger);
+                Debug.Log($"완성된 햄버거 추가됨. 총 개수: {hamburgersInZone.Count}");
+            }
+        }
 
         if (other.CompareTag("Fries") && !friesInZone.Contains(other.gameObject))
+        {
             friesInZone.Add(other.gameObject);
+            Debug.Log($"감자튀김 추가됨. 총 개수: {friesInZone.Count}");
+        }
 
         if (other.CompareTag("Cola") && !colasInZone.Contains(other.gameObject))
+        {
             colasInZone.Add(other.gameObject);
+            Debug.Log($"콜라 추가됨. 총 개수: {colasInZone.Count}");
+        }
 
         UpdateStatusText();
     }
@@ -42,86 +58,152 @@ public class OrderDeliveryZone : MonoBehaviour
     {
         StackHamburger hamburger = other.GetComponent<StackHamburger>();
         if (hamburger != null)
+        {
             hamburgersInZone.Remove(hamburger);
+            Debug.Log($"햄버거 제거됨. 남은 개수: {hamburgersInZone.Count}");
+        }
 
         if (other.CompareTag("Fries"))
+        {
             friesInZone.Remove(other.gameObject);
+            Debug.Log($"감자튀김 제거됨. 남은 개수: {friesInZone.Count}");
+        }
 
         if (other.CompareTag("Cola"))
+        {
             colasInZone.Remove(other.gameObject);
+            Debug.Log($"콜라 제거됨. 남은 개수: {colasInZone.Count}");
+        }
 
         UpdateStatusText();
     }
 
     public void ManualCheckOrder()
     {
-        CheckOrderComplete();
-    }
+        Debug.Log("주문 체크 시작");
 
-    private void CheckOrderComplete()
-    {
-        if (hamburgerRecipe == null) return;
+        if (hamburgerRecipe == null || gameManager == null)
+        {
+            Debug.LogError("HamburgerRecipe 또는 GameManager가 null입니다!");
+            return;
+        }
+
+
 
         if (!hamburgerRecipe.isSetOrder)
         {
+            Debug.Log("단품 주문 체크");
             if (hamburgersInZone.Count > 0)
             {
-                CompleteHamburgerOrder();
+
+
+                StackHamburger burger = hamburgersInZone[0];
+
+                Debug.Log("정답 레시피: " + string.Join(" → ", hamburgerRecipe.currentRecipe));
+                Debug.Log("플레이어 제출: " + string.Join(" → ", burger.stackedIngredients));
+
+
+                Debug.Log($"햄버거 체크: 재료 개수 {burger.stackedIngredients.Count}");
+
+
+
+                // 재료 디버깅
+                for (int i = 0; i < burger.stackedIngredients.Count; i++)
+                {
+                    Debug.Log($"재료 {i}: {burger.stackedIngredients[i]}");
+                }
+
+                // 최소 재료 수 체크 및 레시피 매치 체크
+                bool hasMinIngredients = burger.stackedIngredients.Count >= 3;
+                bool recipeMatch = hasMinIngredients && hamburgerRecipe.CheckPlayerBurger(burger.stackedIngredients);
+
+                Debug.Log($"최소 재료: {hasMinIngredients}, 레시피 매치: {recipeMatch}");
+
+                // 햄버거는 무조건 제거
+                Destroy(burger.gameObject);
+                hamburgersInZone.RemoveAt(0);
+
+                if (recipeMatch)
+                {
+                    Debug.Log("올바른 햄버거! 점수 획득");
+                    if (colasInZone.Count > 0)
+                    {
+                        Destroy(colasInZone[0]);
+                        colasInZone.RemoveAt(0);
+                        gameManager.AddScore(1500);
+                        Debug.Log("콜라 보너스 포함 1500점!");
+                    }
+                    else
+                    {
+                        gameManager.AddScore(1000);
+                        Debug.Log("기본 1000점!");
+                    }
+                }
+                else
+                {
+                    Debug.Log("잘못된 햄버거 - 500점 감점");
+                    gameManager.AddScore(-500);
+                }
+
+                gameManager.OnHamburgerCompleted();
+            }
+            else
+            {
+                Debug.Log("햄버거 없음 - 500점 감점");
+                gameManager.AddScore(-500);
+                gameManager.OnHamburgerCompleted();
             }
         }
         else
         {
-            if (hamburgersInZone.Count > 0 && friesInZone.Count > 0 && colasInZone.Count > 0)
+            Debug.Log("세트 주문 체크");
+            if (hamburgersInZone.Count > 0)
             {
-                CompleteSetOrder();
-            }
-        }
-    }
+                StackHamburger burger = hamburgersInZone[0];
+                bool hasMinIngredients = burger.stackedIngredients.Count >= 3;
+                bool burgerCorrect = hasMinIngredients && hamburgerRecipe.CheckPlayerBurger(burger.stackedIngredients);
+                bool friesOK = friesInZone.Count > 0;
+                bool colaOK = colasInZone.Count > 0;
 
-    private void CompleteHamburgerOrder()
-    {
-        if (hamburgersInZone.Count > 0)
-        {
-            Destroy(hamburgersInZone[0].gameObject);
-            hamburgersInZone.RemoveAt(0);
+                Debug.Log($"세트 체크 - 햄버거: {burgerCorrect}, 감자튀김: {friesOK}, 콜라: {colaOK}");
 
-            if (colasInZone.Count > 0 && hamburgerRecipe.isSetOrder)
-            {
-                Destroy(colasInZone[0]);
-                colasInZone.RemoveAt(0);
-                gameManager.AddScore(1500);
+                // 모든 아이템 제거
+                Destroy(burger.gameObject);
+                hamburgersInZone.RemoveAt(0);
+
+                if (friesOK)
+                {
+                    Destroy(friesInZone[0]);
+                    friesInZone.RemoveAt(0);
+                }
+
+                if (colaOK)
+                {
+                    Destroy(colasInZone[0]);
+                    colasInZone.RemoveAt(0);
+                }
+
+                if (burgerCorrect && friesOK && colaOK)
+                {
+                    Debug.Log("완벽한 세트 주문 완성! 1700점!");
+                    gameManager.AddScore(1700);
+                }
+                else
+                {
+                    Debug.Log("불완전한 세트 주문 - 500점 감점");
+                    gameManager.AddScore(-500);
+                }
+
+                gameManager.OnHamburgerCompleted();
             }
             else
             {
-                gameManager.AddScore(1000);
+                Debug.Log("햄버거 없음 - 500점 감점");
+                gameManager.AddScore(-500);
+                gameManager.OnHamburgerCompleted();
             }
-
-            gameManager.OnHamburgerCompleted();
         }
 
-        UpdateStatusText();
-    }
-
-    private void CompleteSetOrder()
-    {
-        if (hamburgersInZone.Count > 0)
-        {
-            Destroy(hamburgersInZone[0].gameObject);
-            hamburgersInZone.RemoveAt(0);
-        }
-        if (friesInZone.Count > 0)
-        {
-            Destroy(friesInZone[0]);
-            friesInZone.RemoveAt(0);
-        }
-        if (colasInZone.Count > 0)
-        {
-            Destroy(colasInZone[0]);
-            colasInZone.RemoveAt(0);
-        }
-
-        gameManager.AddScore(1700);
-        gameManager.OnHamburgerCompleted();
         UpdateStatusText();
     }
 
@@ -130,8 +212,13 @@ public class OrderDeliveryZone : MonoBehaviour
         if (statusText == null) return;
 
         if (!hamburgerRecipe.isSetOrder)
-            statusText.text = $"�ܹ��� �ʿ�: {hamburgersInZone.Count}/1";
+        {
+            statusText.text = $"햄버거 필요: {hamburgersInZone.Count}/1";
+        }
         else
-            statusText.text = $"��Ʈ �ֹ�\n�ܹ���: {hamburgersInZone.Count}/1\n����Ƣ��: {friesInZone.Count}/1\n�ݶ�: {colasInZone.Count}/1";
+        {
+            statusText.text =
+                $"세트 주문\n햄버거: {hamburgersInZone.Count}/1\n감자튀김: {friesInZone.Count}/1\n콜라: {colasInZone.Count}/1";
+        }
     }
 }
