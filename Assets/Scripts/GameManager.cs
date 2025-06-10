@@ -7,15 +7,19 @@ public class GameManager : MonoBehaviour
     public GameObject countdownUI;
     public TextMeshProUGUI countdownText;
     public TextMeshProUGUI timerText;
+    public TMPro.TextMeshPro scoreTextUI;
+
     public HamburgerRecipe hamburgerRecipe;
+    public float gameDuration = 180f;
+    public GameObject customerAsset;
 
+    public int completedHamburgers = 0;
+    public int hamburgerThreshold = 5;
 
-    public float gameDuration = 180f; // 3분
     private float remainingTime;
     private bool gameRunning = false;
 
-    public GameObject customerAsset;
-   // public BurgerGenerator burgerGenerator;
+    public int score = 0;
 
     public void StartCountdown()
     {
@@ -25,27 +29,24 @@ public class GameManager : MonoBehaviour
     IEnumerator CountdownCoroutine()
     {
         countdownUI.SetActive(true);
-
         for (int i = 3; i >= 1; i--)
         {
             countdownText.text = i.ToString();
             yield return new WaitForSeconds(1f);
         }
-
         countdownUI.SetActive(false);
-        StartGame(); // 카운트 끝나고 게임 시작
+        StartGame();
     }
 
     void StartGame()
     {
         gameRunning = true;
         remainingTime = gameDuration;
-
-        customerAsset.SetActive(true);              // 손님 에셋 등장
-
-        hamburgerRecipe.GenerateRandomHamburger();          // 예시 햄버거 생성
-
-        // 타이머 동작 시작 → Update()에서 관리
+        completedHamburgers = 0;
+        score = 0;
+        customerAsset.SetActive(true);
+        hamburgerRecipe.GenerateRandomOrderText();
+        UpdateScoreUI();
     }
 
     void Update()
@@ -59,25 +60,35 @@ public class GameManager : MonoBehaviour
                 gameRunning = false;
                 EndGame();
             }
+            UpdateTimerUI();
+        }
+    }
 
-            UpdateTimerUI(); // 여기서 UI 갱신
+    public void OnHamburgerCompleted()
+    {
+        completedHamburgers++;
+        Debug.Log($"햄버거 완성! 총 {completedHamburgers}개");
+
+        if (completedHamburgers >= hamburgerThreshold)
+        {
+            hamburgerRecipe.isSetOrder = true;
+            Debug.Log("세트 주문 모드 활성화!");
         }
 
-        if (!gameRunning) return;
+        GenerateNextOrder();
+    }
 
-        remainingTime -= Time.deltaTime;
-        if (remainingTime <= 0f)
+    void GenerateNextOrder()
+    {
+        if (gameRunning)
         {
-            gameRunning = false;
-            EndGame();
+            hamburgerRecipe.GenerateRandomOrderText();
         }
     }
 
     void EndGame()
     {
-        Debug.Log("게임 종료! 점수 표시 등...");
-        // 결과 패널 표시 or 씬 전환 등 구현
-       
+        Debug.Log($"게임 종료! 총 {completedHamburgers}개 / 점수: {score}");
     }
 
     void UpdateTimerUI()
@@ -86,4 +97,19 @@ public class GameManager : MonoBehaviour
         int seconds = Mathf.FloorToInt(remainingTime % 60f);
         timerText.text = $"{minutes:00}:{seconds:00}";
     }
+
+    public void AddScore(int amount)
+    {
+        score += amount;
+        UpdateScoreUI();
+    }
+
+    void UpdateScoreUI()
+    {
+        if (scoreTextUI != null)
+            scoreTextUI.text = $"score: {score}";
+    }
+
+    public bool IsGameRunning() => gameRunning;
+    public int GetCompletedHamburgers() => completedHamburgers;
 }
