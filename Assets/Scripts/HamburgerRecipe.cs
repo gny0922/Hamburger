@@ -112,12 +112,12 @@ public class HamburgerRecipe : MonoBehaviour
         if (orderTextUI != null)
             orderTextUI.text = finalText;
         else
-            Debug.LogWarning("⚠️ orderTextUI가 비어 있음");
+            Debug.LogWarning(" orderTextUI가 비어 있음");
 
         Debug.Log($"새 주문 생성 - 세트 주문: {isSetOrder}, 레시피: {recipeString}");
     }
 
-    // ✅ OrderDeliveryZone에서 호출됨 – 정답 비교 (개선된 버전)
+    //  OrderDeliveryZone에서 호출됨 – 정답 비교 (개선된 버전)
     public bool CheckPlayerBurger(List<IngredientType> playerBurger)
     {
         Debug.Log("=== 햄버거 체크 시작 ===");
@@ -127,7 +127,7 @@ public class HamburgerRecipe : MonoBehaviour
         // 재료 개수가 다르면 실패
         if (playerBurger.Count != currentRecipe.Count)
         {
-            Debug.Log($"❌ 재료 개수 불일치: 플레이어 {playerBurger.Count} vs 레시피 {currentRecipe.Count}");
+            Debug.Log($" 재료 개수 불일치: 플레이어 {playerBurger.Count} vs 레시피 {currentRecipe.Count}");
             return false;
         }
 
@@ -138,12 +138,12 @@ public class HamburgerRecipe : MonoBehaviour
 
             if (currentRecipe[i] != playerBurger[i])
             {
-                Debug.Log($"❌ 재료 불일치 위치 {i}: 플레이어 {playerBurger[i]} vs 레시피 {currentRecipe[i]}");
+                Debug.Log($" 재료 불일치 위치 {i}: 플레이어 {playerBurger[i]} vs 레시피 {currentRecipe[i]}");
                 return false;
             }
         }
 
-        Debug.Log("✅ 햄버거 레시피 완벽 일치!");
+        Debug.Log(" 햄버거 레시피 완벽 일치!");
         return true;
     }
 

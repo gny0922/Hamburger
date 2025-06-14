@@ -26,10 +26,9 @@ public class OrderDeliveryZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-
         Debug.Log($"OnTriggerEnter: {other.name}");
 
-        // StackHamburger 컴포넌트를 직접 찾기 (GetComponentInChildren 대신)
+        // StackHamburger 컴포넌트를 일관되게 찾기
         StackHamburger hamburger = other.GetComponentInParent<StackHamburger>();
         if (hamburger != null)
         {
@@ -58,8 +57,9 @@ public class OrderDeliveryZone : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        StackHamburger hamburger = other.GetComponent<StackHamburger>();
-        if (hamburger != null)
+        // Enter와 동일한 방식으로 햄버거 찾기
+        StackHamburger hamburger = other.GetComponentInParent<StackHamburger>();
+        if (hamburger != null && hamburgersInZone.Contains(hamburger))
         {
             hamburgersInZone.Remove(hamburger);
             Debug.Log($"햄버거 제거됨. 남은 개수: {hamburgersInZone.Count}");
@@ -91,9 +91,8 @@ public class OrderDeliveryZone : MonoBehaviour
             return;
         }
 
-        
         // null이거나 파괴된 오브젝트들을 리스트에서 제거
-        CleanupDestroyedObjects();
+        //CleanupDestroyedObjects();
 
         if (!hamburgerRecipe.isSetOrder)
         {
@@ -119,8 +118,10 @@ public class OrderDeliveryZone : MonoBehaviour
 
                 Debug.Log($"최소 재료: {hasMinIngredients}, 레시피 매치: {recipeMatch}");
 
-                // 리스트에서 먼저 제거한 후 오브젝트 파괴
-                hamburgersInZone.RemoveAt(0);
+                // 리스트에서 제거 (리셋 전에)
+                hamburgersInZone.Remove(burger);
+
+                // 리셋
                 burger.ResetHamburger();
 
                 if (recipeMatch)
@@ -168,8 +169,10 @@ public class OrderDeliveryZone : MonoBehaviour
 
                 Debug.Log($"세트 체크 - 햄버거: {burgerCorrect}, 감자튀김: {friesOK}, 콜라: {colaOK}");
 
-                // 리스트에서 먼저 제거한 후 오브젝트들 파괴
-                hamburgersInZone.RemoveAt(0);
+                // 리스트에서 제거 (리셋 전에)
+                hamburgersInZone.Remove(burger);
+
+                // 리셋
                 burger.ResetHamburger();
 
                 if (friesOK)
@@ -210,23 +213,6 @@ public class OrderDeliveryZone : MonoBehaviour
         UpdateStatusText();
     }
 
-
-    
-    // 안전하게 햄버거 오브젝트를 파괴하는 메서드
-    private void DestroyHamburgerSafely(StackHamburger burger)
-    {
-        if (burger != null && burger.gameObject != null)
-        {
-            // 자식 오브젝트들(재료들)도 함께 파괴됨
-            Destroy(burger.gameObject);
-            Debug.Log($"햄버거 오브젝트 파괴됨: {burger.name}");
-        }
-        else
-        {
-            Debug.LogWarning("파괴하려는 햄버거가 null이거나 이미 파괴되었습니다.");
-        }
-    }
-
     // 파괴된 오브젝트들을 리스트에서 정리하는 메서드
     private void CleanupDestroyedObjects()
     {
@@ -235,6 +221,7 @@ public class OrderDeliveryZone : MonoBehaviour
         {
             if (hamburgersInZone[i] == null || hamburgersInZone[i].gameObject == null)
             {
+                Debug.Log($"파괴된 햄버거 리스트에서 제거: 인덱스 {i}");
                 hamburgersInZone.RemoveAt(i);
             }
         }
@@ -244,6 +231,7 @@ public class OrderDeliveryZone : MonoBehaviour
         {
             if (friesInZone[i] == null)
             {
+                Debug.Log($"파괴된 감자튀김 리스트에서 제거: 인덱스 {i}");
                 friesInZone.RemoveAt(i);
             }
         }
@@ -253,12 +241,11 @@ public class OrderDeliveryZone : MonoBehaviour
         {
             if (colasInZone[i] == null)
             {
+                Debug.Log($"파괴된 콜라 리스트에서 제거: 인덱스 {i}");
                 colasInZone.RemoveAt(i);
             }
         }
     }
-
-    
 
     private void UpdateStatusText()
     {

@@ -10,7 +10,7 @@ public class StackHamburger : MonoBehaviour
     public BoxCollider triggerCollider;
     public TextMeshPro textMesh;
     public int dishNumber;
-    public bool isComplete = false; // 최소 재료 수 충족 여부만 표시
+    public bool isComplete = false;
     public HamburgerRecipe hamburgerRecipe;
 
     private void Start()
@@ -88,31 +88,34 @@ public class StackHamburger : MonoBehaviour
 
     public void ResetHamburger()
     {
-        Debug.Log("햄버거 리셋");
+        Debug.Log($"햄버거 리셋 시작: {gameObject.name}");
 
         // 자식 중 IngredientData가 붙은 재료만 삭제
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             Transform child = transform.GetChild(i);
 
+            // IngredientData 컴포넌트가 있는 것만 삭제 (재료들)
             if (child.GetComponent<IngredientData>() != null)
             {
+                Debug.Log($"재료 삭제: {child.name}");
                 Destroy(child.gameObject);
             }
         }
 
+        // 상태 초기화
         stackedIngredients.Clear();
         totalHeight = 0.005f;
         isComplete = false;
 
-        triggerCollider.size = new Vector3(triggerCollider.size.x, 0.1f, triggerCollider.size.z);
-        triggerCollider.center = new Vector3(triggerCollider.center.x, 0.05f, triggerCollider.center.z);
-
+        // 텍스트 숨기기
         if (textMesh != null)
             textMesh.gameObject.SetActive(false);
+
+        Debug.Log($"햄버거 리셋 완료: {gameObject.name}");
     }
 
-    // 디버깅용 메서드 - 외부에서 호출 가능
+    // 디버깅 메서드 - 외부에서 호출 가능
     public void PrintCurrentStack()
     {
         DebugCurrentStack();
