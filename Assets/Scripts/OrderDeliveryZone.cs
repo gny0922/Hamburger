@@ -91,6 +91,7 @@ public class OrderDeliveryZone : MonoBehaviour
             return;
         }
 
+        
         // null이거나 파괴된 오브젝트들을 리스트에서 제거
         CleanupDestroyedObjects();
 
@@ -120,7 +121,7 @@ public class OrderDeliveryZone : MonoBehaviour
 
                 // 리스트에서 먼저 제거한 후 오브젝트 파괴
                 hamburgersInZone.RemoveAt(0);
-                DestroyHamburgerSafely(burger);
+                burger.ResetHamburger();
 
                 if (recipeMatch)
                 {
@@ -169,7 +170,7 @@ public class OrderDeliveryZone : MonoBehaviour
 
                 // 리스트에서 먼저 제거한 후 오브젝트들 파괴
                 hamburgersInZone.RemoveAt(0);
-                DestroyHamburgerSafely(burger);
+                burger.ResetHamburger();
 
                 if (friesOK)
                 {
@@ -209,6 +210,8 @@ public class OrderDeliveryZone : MonoBehaviour
         UpdateStatusText();
     }
 
+
+    
     // 안전하게 햄버거 오브젝트를 파괴하는 메서드
     private void DestroyHamburgerSafely(StackHamburger burger)
     {
@@ -254,6 +257,8 @@ public class OrderDeliveryZone : MonoBehaviour
             }
         }
     }
+
+    
 
     private void UpdateStatusText()
     {

@@ -50,8 +50,6 @@ public class StackHamburger : MonoBehaviour
         newMesh.transform.localRotation = Quaternion.Euler(0, Random.Range(0f, 180f), 0);
 
         totalHeight += height;
-        triggerCollider.size = new Vector3(triggerCollider.size.x, triggerCollider.size.y + height, triggerCollider.size.z);
-        triggerCollider.center = new Vector3(triggerCollider.center.x, triggerCollider.center.y + height / 2f, triggerCollider.center.z);
 
         // 최소 재료 수만 체크 (3개 이상이면 완성으로 표시)
         CheckMinimumIngredients();
@@ -92,10 +90,15 @@ public class StackHamburger : MonoBehaviour
     {
         Debug.Log("햄버거 리셋");
 
-        // 자식 오브젝트들(재료들) 모두 제거
+        // 자식 중 IngredientData가 붙은 재료만 삭제
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
-            Destroy(transform.GetChild(i).gameObject);
+            Transform child = transform.GetChild(i);
+
+            if (child.GetComponent<IngredientData>() != null)
+            {
+                Destroy(child.gameObject);
+            }
         }
 
         stackedIngredients.Clear();
