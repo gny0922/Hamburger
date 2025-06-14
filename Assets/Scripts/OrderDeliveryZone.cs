@@ -26,16 +26,18 @@ public class OrderDeliveryZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+
         Debug.Log($"OnTriggerEnter: {other.name}");
 
-        StackHamburger hamburger = other.GetComponentInChildren<StackHamburger>();
+        // StackHamburger 컴포넌트를 직접 찾기 (GetComponentInChildren 대신)
+        StackHamburger hamburger = other.GetComponentInParent<StackHamburger>();
         if (hamburger != null)
         {
             Debug.Log($"햄버거 발견: {hamburger.name}, 완성 상태: {hamburger.isComplete}");
-            if (hamburger.isComplete && !hamburgersInZone.Contains(hamburger))
+            if (!hamburgersInZone.Contains(hamburger))
             {
                 hamburgersInZone.Add(hamburger);
-                Debug.Log($"완성된 햄버거 추가됨. 총 개수: {hamburgersInZone.Count}");
+                Debug.Log($"햄버거 등록됨 (완성 여부 상관없음): {hamburger.name}");
             }
         }
 
@@ -80,6 +82,7 @@ public class OrderDeliveryZone : MonoBehaviour
 
     public void ManualCheckOrder()
     {
+        Debug.Log($"수동 체크 시작 - 햄버거 수: {hamburgersInZone.Count}");
         Debug.Log("주문 체크 시작");
 
         if (hamburgerRecipe == null || gameManager == null)
@@ -88,24 +91,20 @@ public class OrderDeliveryZone : MonoBehaviour
             return;
         }
 
-
+        // null이거나 파괴된 오브젝트들을 리스트에서 제거
+        CleanupDestroyedObjects();
 
         if (!hamburgerRecipe.isSetOrder)
         {
             Debug.Log("단품 주문 체크");
             if (hamburgersInZone.Count > 0)
             {
-
-
                 StackHamburger burger = hamburgersInZone[0];
 
                 Debug.Log("정답 레시피: " + string.Join(" → ", hamburgerRecipe.currentRecipe));
                 Debug.Log("플레이어 제출: " + string.Join(" → ", burger.stackedIngredients));
 
-
                 Debug.Log($"햄버거 체크: 재료 개수 {burger.stackedIngredients.Count}");
-
-
 
                 // 재료 디버깅
                 for (int i = 0; i < burger.stackedIngredients.Count; i++)
@@ -119,17 +118,18 @@ public class OrderDeliveryZone : MonoBehaviour
 
                 Debug.Log($"최소 재료: {hasMinIngredients}, 레시피 매치: {recipeMatch}");
 
-                // 햄버거는 무조건 제거
-                Destroy(burger.gameObject);
+                // 리스트에서 먼저 제거한 후 오브젝트 파괴
                 hamburgersInZone.RemoveAt(0);
+                DestroyHamburgerSafely(burger);
 
                 if (recipeMatch)
                 {
                     Debug.Log("올바른 햄버거! 점수 획득");
                     if (colasInZone.Count > 0)
                     {
-                        Destroy(colasInZone[0]);
+                        GameObject cola = colasInZone[0];
                         colasInZone.RemoveAt(0);
+                        Destroy(cola);
                         gameManager.AddScore(1500);
                         Debug.Log("콜라 보너스 포함 1500점!");
                     }
@@ -167,20 +167,22 @@ public class OrderDeliveryZone : MonoBehaviour
 
                 Debug.Log($"세트 체크 - 햄버거: {burgerCorrect}, 감자튀김: {friesOK}, 콜라: {colaOK}");
 
-                // 모든 아이템 제거
-                Destroy(burger.gameObject);
+                // 리스트에서 먼저 제거한 후 오브젝트들 파괴
                 hamburgersInZone.RemoveAt(0);
+                DestroyHamburgerSafely(burger);
 
                 if (friesOK)
                 {
-                    Destroy(friesInZone[0]);
+                    GameObject fries = friesInZone[0];
                     friesInZone.RemoveAt(0);
+                    Destroy(fries);
                 }
 
                 if (colaOK)
                 {
-                    Destroy(colasInZone[0]);
+                    GameObject cola = colasInZone[0];
                     colasInZone.RemoveAt(0);
+                    Destroy(cola);
                 }
 
                 if (burgerCorrect && friesOK && colaOK)
@@ -205,6 +207,52 @@ public class OrderDeliveryZone : MonoBehaviour
         }
 
         UpdateStatusText();
+    }
+
+    // 안전하게 햄버거 오브젝트를 파괴하는 메서드
+    private void DestroyHamburgerSafely(StackHamburger burger)
+    {
+        if (burger != null && burger.gameObject != null)
+        {
+            // 자식 오브젝트들(재료들)도 함께 파괴됨
+            Destroy(burger.gameObject);
+            Debug.Log($"햄버거 오브젝트 파괴됨: {burger.name}");
+        }
+        else
+        {
+            Debug.LogWarning("파괴하려는 햄버거가 null이거나 이미 파괴되었습니다.");
+        }
+    }
+
+    // 파괴된 오브젝트들을 리스트에서 정리하는 메서드
+    private void CleanupDestroyedObjects()
+    {
+        // null이거나 파괴된 햄버거들 제거
+        for (int i = hamburgersInZone.Count - 1; i >= 0; i--)
+        {
+            if (hamburgersInZone[i] == null || hamburgersInZone[i].gameObject == null)
+            {
+                hamburgersInZone.RemoveAt(i);
+            }
+        }
+
+        // null이거나 파괴된 감자튀김들 제거
+        for (int i = friesInZone.Count - 1; i >= 0; i--)
+        {
+            if (friesInZone[i] == null)
+            {
+                friesInZone.RemoveAt(i);
+            }
+        }
+
+        // null이거나 파괴된 콜라들 제거
+        for (int i = colasInZone.Count - 1; i >= 0; i--)
+        {
+            if (colasInZone[i] == null)
+            {
+                colasInZone.RemoveAt(i);
+            }
+        }
     }
 
     private void UpdateStatusText()

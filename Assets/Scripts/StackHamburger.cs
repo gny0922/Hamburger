@@ -43,6 +43,7 @@ public class StackHamburger : MonoBehaviour
     public void StackIngredient(GameObject meshObject, float height, IngredientType ingredientType)
     {
         stackedIngredients.Add(ingredientType);
+        Debug.Log($"재료 추가됨: {ingredientType} (총 {stackedIngredients.Count}개)");
 
         GameObject newMesh = Instantiate(meshObject, transform);
         newMesh.transform.localPosition = new Vector3(0, totalHeight, 0);
@@ -52,8 +53,11 @@ public class StackHamburger : MonoBehaviour
         triggerCollider.size = new Vector3(triggerCollider.size.x, triggerCollider.size.y + height, triggerCollider.size.z);
         triggerCollider.center = new Vector3(triggerCollider.center.x, triggerCollider.center.y + height / 2f, triggerCollider.center.z);
 
-        // 최소 재료 수만 체크 (예: 3개 이상이면 완성으로 표시)
+        // 최소 재료 수만 체크 (3개 이상이면 완성으로 표시)
         CheckMinimumIngredients();
+
+        // 디버깅용: 현재 쌓인 재료들 출력
+        DebugCurrentStack();
     }
 
     private void CheckMinimumIngredients()
@@ -67,12 +71,28 @@ public class StackHamburger : MonoBehaviour
                 textMesh.color = Color.yellow; // 노란색으로 준비 상태 표시
                 textMesh.gameObject.SetActive(true);
             }
+            Debug.Log($"햄버거 준비 완료 (재료 {stackedIngredients.Count}개)");
         }
+    }
+
+    // 디버깅용: 현재 쌓인 재료들을 출력
+    private void DebugCurrentStack()
+    {
+        Debug.Log("=== 현재 햄버거 상태 ===");
+        Debug.Log($"재료 개수: {stackedIngredients.Count}");
+        for (int i = 0; i < stackedIngredients.Count; i++)
+        {
+            Debug.Log($"위치 {i}: {stackedIngredients[i]}");
+        }
+        Debug.Log($"완성 상태: {isComplete}");
+        Debug.Log("====================");
     }
 
     public void ResetHamburger()
     {
-        // CheeseRoot 같은 껍데기까지 포함해서 전부 제거
+        Debug.Log("햄버거 리셋");
+
+        // 자식 오브젝트들(재료들) 모두 제거
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             Destroy(transform.GetChild(i).gameObject);
@@ -87,5 +107,11 @@ public class StackHamburger : MonoBehaviour
 
         if (textMesh != null)
             textMesh.gameObject.SetActive(false);
+    }
+
+    // 디버깅용 메서드 - 외부에서 호출 가능
+    public void PrintCurrentStack()
+    {
+        DebugCurrentStack();
     }
 }

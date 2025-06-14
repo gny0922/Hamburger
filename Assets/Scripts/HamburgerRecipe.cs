@@ -117,25 +117,33 @@ public class HamburgerRecipe : MonoBehaviour
         Debug.Log($"새 주문 생성 - 세트 주문: {isSetOrder}, 레시피: {recipeString}");
     }
 
-    // ✅ OrderDeliveryZone에서 호출됨 – 정답 비교
+    // ✅ OrderDeliveryZone에서 호출됨 – 정답 비교 (개선된 버전)
     public bool CheckPlayerBurger(List<IngredientType> playerBurger)
     {
+        Debug.Log("=== 햄버거 체크 시작 ===");
+        Debug.Log($"플레이어 햄버거 재료 수: {playerBurger.Count}");
+        Debug.Log($"정답 레시피 재료 수: {currentRecipe.Count}");
+
+        // 재료 개수가 다르면 실패
         if (playerBurger.Count != currentRecipe.Count)
         {
-            Debug.Log($"재료 개수 불일치: 플레이어 {playerBurger.Count} vs 레시피 {currentRecipe.Count}");
+            Debug.Log($"❌ 재료 개수 불일치: 플레이어 {playerBurger.Count} vs 레시피 {currentRecipe.Count}");
             return false;
         }
 
+        // 각 재료를 순서대로 비교
         for (int i = 0; i < currentRecipe.Count; i++)
         {
+            Debug.Log($"위치 {i}: 플레이어={playerBurger[i]} vs 레시피={currentRecipe[i]}");
+
             if (currentRecipe[i] != playerBurger[i])
             {
-                Debug.Log($"재료 불일치 위치 {i}: 플레이어 {playerBurger[i]} vs 레시피 {currentRecipe[i]}");
+                Debug.Log($"❌ 재료 불일치 위치 {i}: 플레이어 {playerBurger[i]} vs 레시피 {currentRecipe[i]}");
                 return false;
             }
         }
 
-        Debug.Log("햄버거 레시피 일치!");
+        Debug.Log("✅ 햄버거 레시피 완벽 일치!");
         return true;
     }
 
@@ -144,5 +152,11 @@ public class HamburgerRecipe : MonoBehaviour
     {
         Debug.Log($"현재 주문 {orderCount}번 - 세트: {isSetOrder}");
         Debug.Log($"레시피: {string.Join(" → ", currentRecipe)}");
+
+        Debug.Log("=== 현재 레시피 상세 ===");
+        for (int i = 0; i < currentRecipe.Count; i++)
+        {
+            Debug.Log($"위치 {i}: {currentRecipe[i]}");
+        }
     }
 }
