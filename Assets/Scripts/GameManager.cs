@@ -84,6 +84,8 @@ public class GameManager : MonoBehaviour
         {
             hamburgerRecipe.GenerateRandomOrderText();
         }
+
+
     }
 
     void EndGame()

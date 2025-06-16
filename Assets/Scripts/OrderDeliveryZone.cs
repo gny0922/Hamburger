@@ -123,6 +123,7 @@ public class OrderDeliveryZone : MonoBehaviour
 
                 // 리셋
                 burger.ResetHamburger();
+                hamburgersInZone.Add(burger);
 
                 if (recipeMatch)
                 {
@@ -174,6 +175,7 @@ public class OrderDeliveryZone : MonoBehaviour
 
                 // 리셋
                 burger.ResetHamburger();
+                hamburgersInZone.Add(burger);
 
                 if (friesOK)
                 {
