@@ -215,39 +215,7 @@ public class OrderDeliveryZone : MonoBehaviour
         UpdateStatusText();
     }
 
-    // 파괴된 오브젝트들을 리스트에서 정리하는 메서드
-    private void CleanupDestroyedObjects()
-    {
-        // null이거나 파괴된 햄버거들 제거
-        for (int i = hamburgersInZone.Count - 1; i >= 0; i--)
-        {
-            if (hamburgersInZone[i] == null || hamburgersInZone[i].gameObject == null)
-            {
-                Debug.Log($"파괴된 햄버거 리스트에서 제거: 인덱스 {i}");
-                hamburgersInZone.RemoveAt(i);
-            }
-        }
 
-        // null이거나 파괴된 감자튀김들 제거
-        for (int i = friesInZone.Count - 1; i >= 0; i--)
-        {
-            if (friesInZone[i] == null)
-            {
-                Debug.Log($"파괴된 감자튀김 리스트에서 제거: 인덱스 {i}");
-                friesInZone.RemoveAt(i);
-            }
-        }
-
-        // null이거나 파괴된 콜라들 제거
-        for (int i = colasInZone.Count - 1; i >= 0; i--)
-        {
-            if (colasInZone[i] == null)
-            {
-                Debug.Log($"파괴된 콜라 리스트에서 제거: 인덱스 {i}");
-                colasInZone.RemoveAt(i);
-            }
-        }
-    }
 
     private void UpdateStatusText()
     {

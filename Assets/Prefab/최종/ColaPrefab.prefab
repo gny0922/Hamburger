@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2274335601679150468}
   - component: {fileID: 3377091812129724158}
   - component: {fileID: 6075688822581381576}
+  - component: {fileID: 702076881354256974}
   m_Layer: 0
   m_Name: ColaPrefab
   m_TagString: Cola
@@ -257,3 +258,16 @@ MonoBehaviour:
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
   m_FarAttachMode: 0
+--- !u!114 &702076881354256974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8854226512611584852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0d0f465dcb52ca47ae427e2ff4fec4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshPrefab: {fileID: 5838343536198195810, guid: 7bc79a1821b5db244963c71ce8cd951a, type: 3}

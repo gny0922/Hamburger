@@ -8,6 +8,7 @@ TagManager:
   - Ingredient
   - Fries
   - Cola
+  - Tray
   layers:
   - Default
   - TransparentFX

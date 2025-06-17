@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI countdownText;
     public TextMeshProUGUI timerText;
     public TMPro.TextMeshPro scoreTextUI;
+    public GameObject gameOverPanel;
+    public TextMeshProUGUI finalScoreText;
 
     public HamburgerRecipe hamburgerRecipe;
     public float gameDuration = 180f;
@@ -47,6 +49,9 @@ public class GameManager : MonoBehaviour
         customerAsset.SetActive(true);
         hamburgerRecipe.GenerateRandomOrderText();
         UpdateScoreUI();
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false); // 게임 시작 시 패널 숨김
     }
 
     void Update()
@@ -91,6 +96,12 @@ public class GameManager : MonoBehaviour
     void EndGame()
     {
         Debug.Log($"게임 종료! 총 {completedHamburgers}개 / 점수: {score}");
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        if (finalScoreText != null)
+            finalScoreText.text = $"최종 점수: {score}점";
     }
 
     void UpdateTimerUI()
