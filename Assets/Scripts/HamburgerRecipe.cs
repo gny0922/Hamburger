@@ -19,7 +19,7 @@ public class HamburgerRecipe : MonoBehaviour
     [HideInInspector]
     public GameManager gameManager;
 
-    private int orderCount = 0;
+    public int orderCount = 0;
 
     // 햄버거 전용 대사
     private readonly List<string> burgerOnlyDialogs = new List<string>
