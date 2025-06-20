@@ -170,6 +170,7 @@ public class OrderDeliveryZone : MonoBehaviour
                 hamburgersInZone.Remove(burger);
                 burger.ResetHamburger();
                 hamburgersInZone.Add(burger);
+
                 // 감자튀김 처리
                 if (friesInZone.Count > 0)
                 {
@@ -187,17 +188,21 @@ public class OrderDeliveryZone : MonoBehaviour
                 }
 
                 // 최종 판정
-                if (burgerCorrect && friesOK && colaOK)
+                if (needsCola &&  burgerCorrect && friesOK && colaOK)
                 {
                     Debug.Log("정확한 세트 주문 처리 완료! +1700점");
                     gameManager.AddScore(1700);
+                }
+                else if (burgerCorrect && friesOK && !needsCola)
+                {
+                    Debug.Log("감자튀김 세트 완료! +1500점");
+                    gameManager.AddScore(1500);
                 }
                 else
                 {
                     Debug.Log("불완전한 세트 주문 - 500점 감점");
                     gameManager.AddScore(-500);
                 }
-
                 gameManager.OnHamburgerCompleted();
             }
             else
